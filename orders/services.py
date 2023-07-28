@@ -6,6 +6,6 @@ def create_order_items(order, cart):
         OrderItem.objects.create(
             order=order,
             product=item["product"],
-            item=item["price"],
+            price=item["price"],
             quantity=item["quantity"],
         )
