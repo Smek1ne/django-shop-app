@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 
 from cart.cart import Cart
-from .forms import OrderCreateForm
 
 # from .services import create_order_items
 from orders import services, tasks
-from django.urls import reverse
+from .forms import OrderCreateForm
+from .models import Order
+
 
 # Create your views here.
 
@@ -30,3 +32,8 @@ def order_create(request):
     return render(
         request, "orders/order/create.html", {"cart": cart, "form": form}
     )
+
+
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, "admin/orders/order/detail.html", {"order": order})
