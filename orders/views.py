@@ -1,5 +1,9 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+
+# from .services import render_to_pdf
+
 
 from cart.cart import Cart
 
@@ -7,6 +11,7 @@ from cart.cart import Cart
 from orders import services, tasks
 from .forms import OrderCreateForm
 from .models import Order
+from .services import render_to_pdf
 
 
 # Create your views here.
@@ -37,3 +42,13 @@ def order_create(request):
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, "admin/orders/order/detail.html", {"order": order})
+
+
+def admin_order_pdf(request, order_id):
+    """Takes the order obj and returns response with pdf file based on it"""
+    order = get_object_or_404(Order, id=order_id)
+    pdf: HttpResponse = render_to_pdf(
+        "orders/order/pdf.html", {"order": order}, response=True
+    )
+    pdf["Content-Disposition"] = f"filename=order_{order.id}.pdf"
+    return pdf

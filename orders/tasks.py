@@ -17,4 +17,4 @@ def order_created(order_id):
     return mail_sent
 
 
-"feat: email send(Celery task, RabbitMQ) when order is created"
+
