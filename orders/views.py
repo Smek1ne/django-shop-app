@@ -26,7 +26,11 @@ def order_create(request):
     if request.method == "POST":
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            order = form.save()
+            order = form.save(commit=False)
+            if cart.coupon:
+                order.coupon, order.discount = cart.coupon, cart.coupon.discount
+            order.save()
+
             services.create_order_items(order, cart)
             cart.clear()
             tasks.order_created.delay(order.id)

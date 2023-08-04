@@ -3,6 +3,9 @@ from django.db import models
 from django.db.models import PositiveIntegerField
 
 from shop.models import Product
+from coupons.models import Coupon
+from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
 
 
 # Create your models here.
@@ -15,8 +18,16 @@ class Order(models.Model):
     city = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
     paid = models.BooleanField(default=False)
     stripe_id = models.CharField(max_length=250, blank=True)
+
+    coupon = models.ForeignKey(
+        Coupon, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    discount = models.IntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
 
     class Meta:
         ordering = ["-created"]
@@ -29,8 +40,17 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id}"
 
-    def get_total_cost(self):
+    def get_cost_before_discount(self):
         return sum(item.get_cost() for item in self.items.all())
+
+    def get_discount(self):
+        if self.discount:
+            cost = self.get_cost_before_discount()
+            return self.discount / Decimal(100) * cost
+        return Decimal(0)
+
+    def get_total_cost(self):
+        return self.get_cost_before_discount() - self.get_discount()
 
     def get_stripe_url(self):
         if not self.stripe_id:

@@ -24,6 +24,7 @@ urlpatterns = [
     path("cart/", include("cart.urls", namespace="cart")),
     path("order/", include("orders.urls", namespace="order")),
     path("payment/", include("payment.urls", namespace="payment")),
+    path("coupons/", include("coupons.urls", namespace="coupons")),
     path("", include("shop.urls", namespace="shop")),
 ]
 
